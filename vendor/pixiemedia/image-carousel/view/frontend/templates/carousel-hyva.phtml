@@ -1,0 +1,201 @@
+<?php
+/**
+ * Template for displaying Pixie Media Image Carousel
+ *
+ */
+?>
+<?php 
+$groupid = $block->getData('groupid');
+$group   = $block->getGroup($groupid);
+
+if($groupid) { 
+	$images = $block->carouselimages($groupid); 
+	$helper = $this->helper('PixieMedia\ImageCarousel\Helper\Cms');
+	$random = $helper->randomNumber();
+	$i      = 0;
+	$arrow  = '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" class="pm-ic-arrow" viewBox="0 0 20 20"><path  d="M10,20A10,10,0,1,0,0,10,10,10,0,0,0,10,20ZM8.711,4.3l5.7,5.766L8.7,15.711,7.3,14.289l4.289-4.242L7.289,5.7Z"/></svg>'; 
+	if($images) {
+	?>
+		
+			
+			<?php 
+			$title = $group->getLabel();
+			if(!$title) { $title = 'Image Carousel'; } 
+			?>
+			<?php $styled_name = $helper->cleanString($title.$random); ?>
+
+			<div class="block widget pm-widget-wrap block-products-list pm-ic-<?= $styled_name ?>">
+			<div class="feat-line">
+			<div class="feat-white">
+				<span class="title"><?= $title; ?></span>
+			</div>
+			</div>
+				
+			<div class="block-content pm-brands splide pm-ident-<?php echo $styled_name; ?> "  data-splide-id="pm-ident-<?php echo $styled_name; ?>">
+					
+				<div class="splide__arrows">
+					<button class="splide__arrow splide__arrow--prev"><?= $arrow ?></button>
+					<button class="splide__arrow splide__arrow--next"><?= $arrow ?></button>
+			    </div>
+	  
+			<div class="splide__track">
+			<div class="splide__list">
+			
+			<?php foreach($images as $image) {
+				
+				$photo     = ($image->getImage())?'<img src="'.$block->resize($image->getImage(),$group->getImagewidth(),$group->getImageheight()).'" class="pm-ic-img" alt="'.$image->getName().'" loading="lazy" />':false;
+				$svgBg     = (!$photo && $image->getBlockColour())?$block->getSvg($group->getImagewidth(), $group->getImageheight(),"w-full relative pm-carou-imagewrap", $image->getBlockColour()):false;
+				$link      = ($image->getLink() && $image->getLink() !== '#')?$image->getLink():false;
+			    $txtCol    = ($image->getTextColour())?'style="color:'.$image->getTextColour().' !important;"':'';
+			    $overlay   = ($image->getOverlayColour())?'<div class="pm-carou-overlay" style="background:'.$image->getOverlayColour().'"></div>':'';
+				$content   = ($image->getContent())?$image->getContent():false;
+			    $contAlign = ($image->getContentAlign())?'pm-alignment-override '.$image->getContentAlign():'';
+				
+				if(!$photo && !$svgBg) {
+					continue;
+				}
+				
+				$i++;
+				
+				echo '<div class="pm-brand-block splide__slide">';
+				
+				if($link) {
+					echo '<a href="'.$image->getLink().'" title="'.$image->getName().'">';
+				}
+				
+				echo $photo.$svgBg.$overlay;
+				
+				if($link) {
+					echo '</a>';
+				}
+				
+				if($content) { 
+					echo '<div class="caro-content '. $contAlign .'" '. $txtCol .'><div class="caro-container">'.$helper->filterData($content) .'</div></div>';
+				}
+				
+				echo '</div>';
+				
+				
+			} ?>
+			</div></div></div>
+		</div>
+	
+	<script>
+		(function () {
+		<?php $splideCssUrl = $block->getViewFileUrl('PixieMedia_ImageCarousel::css/splide4.min.css');  ?>
+		const styleSheetHref = '<?= $escaper->escapeJs($escaper->escapeUrl($splideCssUrl)) ?>'
+
+		if (typeof window.SplideCSS === 'undefined') {
+			const style = document.createElement("link");
+			style.rel = "stylesheet";
+			style.type = "text/css";
+			style.href = styleSheetHref;
+
+			const insertAt = document.getElementsByTagName('link')[0];
+			if (insertAt) { // prevent conflicts by loading before other CSS
+				insertAt.parentNode.insertBefore(style, insertAt);
+			} else {
+				document.head.appendChild(style);
+			}
+			window.SplideCSS = 'loaded';
+		}
+
+
+		function initSplide<?php echo $styled_name; ?>() {
+			const elements = document.querySelectorAll('[data-splide-id="pm-ident-<?php echo $styled_name; ?>"]');
+			new Splide('.splide.pm-ident-<?php echo $styled_name; ?>', {
+					
+					type: <?php if ($group->getInfinite()) { ?>'loop'<?php } else { ?>'slide'<?php } ?>,
+					
+					perPage: <?php echo $group->getSlidestoshow(); ?>,
+					perMove: <?php echo $group->getSlidestoscroll(); ?>,
+				    rewind: true,
+					gap: '30px',
+					updateOnMove: true,
+					autoplay: <?php if ($group->getAutoplay() && $i > $group->getSlidestoshow()) { ?>true<?php } else { ?>false<?php } ?>,
+					arrows: 'slider',
+					breakpoints: {
+					
+					    <?php echo $group->getBreakpointthree(); ?>: { perPage: <?php echo $group->getResthreeslidestoshow(); ?>, perMove: <?php echo $group->getResthreeslidestoscroll(); ?>, autoplay: <?php if ($group->getAutoplay() && $i > $group->getResthreeslidestoshow()) { ?>true<?php } else { ?>false<?php } ?>, },
+						<?php echo $group->getBreakpointtwo(); ?>: { perPage: <?php echo $group->getRestwoslidestoshow(); ?>, perMove: <?php echo $group->getRestwoslidestoscroll(); ?>, autoplay: <?php if ($group->getAutoplay() && $i > $group->getRestwoslidestoshow()) { ?>true<?php } else { ?>false<?php } ?>, },
+					    <?php echo $group->getBreakpointone(); ?>: { perPage: <?php echo $group->getResoneslidestoshow(); ?>, perMove: <?php echo $group->getResoneslidestoscroll(); ?>, autoplay: <?php if ($group->getAutoplay() && $i > $group->getResoneslidestoshow()) { ?>true<?php } else { ?>false<?php } ?>, }
+                               
+					},
+					classes: {
+						pagination: 'splide__pagination bottom-auto top-full mt-2',
+						page      : 'splide__pagination__page shadow',
+					}
+				}).mount();
+		}
+
+		if (typeof window.Splide === 'function') {
+			initSplide<?php echo $styled_name; ?>();
+		} else {
+			<?php $splideJsUrl = $block->getViewFileUrl('PixieMedia_ImageCarousel::js/splide4.min.js'); ?>
+			const scriptSource = '<?= $escaper->escapeJs($escaper->escapeUrl($splideJsUrl)) ?>';
+
+			const pendingLoadScript = Array.from(document.scripts).find(script => script.src === scriptSource);
+
+			if (pendingLoadScript){ // Splide is already being loaded
+				pendingLoadScript.addEventListener('load', () => initSplide<?php echo $styled_name; ?>());
+				return;
+			}
+
+			const script = document.createElement('script')
+			script.src = scriptSource;
+			script.async = true;
+
+			script.addEventListener('load', () => initSplide<?php echo $styled_name; ?>());
+			document.head.append(script);
+		}
+
+	})();
+
+</script>
+
+	<?php 
+	// CSS ADDED AND MINIFIED TO TEMPLATE TO PREVENT THE NEED FOR A STYLESHEET ON EVERY PAGE LOAD	
+	$css = '
+	
+	.columns .column.main { max-width:100% !important; }
+	.pm-ic-'. $styled_name .' { width:100%; max-width:100%; margin:25px auto; }
+	.pm-ic-'. $styled_name .' .feat-white { margin-bottom: 40px; }
+	.pm-ic-'. $styled_name .' { width:100%;  }
+	.pm-ident-'. $styled_name .' .pm-brand-block { width:100%; margin:0 10px !important; text-align:center; position:relative; }
+	.pm-ident-'. $styled_name .' .pm-brand-block .pm-carou-overlay { position:absolute; width: 100%; height: 100%; left: 50%; top: 50%; transform:translate(-50%,-50%); z-index: 2; }
+	.pm-ident-'. $styled_name .' .pm-brand-block .caro-content { position: absolute; z-index: 5; top:0; left: 0; padding: 10px; box-sizing:border-box; color:#000; width: 100%; height: 100%; left: 50%; top: 50%; transform:translate(-50%,-50%); }
+	.pm-ic-'. $styled_name .' .feat-line { width:100%; margin-bottom:25px; }
+	.pm-ic-'. $styled_name .' .feat-white { width:100%; position:relative; border-bottom:1px solid #dadada;font-size:24px; padding-bottom:1px; text-align:center; }
+	.pm-ic-'. $styled_name .' .pm-ic-arrow { width: 40px; height: 40px; }
+	.pm-ic-'. $styled_name .' button.splide__arrow { padding:0; margin:0; background:none; width: 40px; height: 40px; }
+	.pm-ic-'. $styled_name .' button.splide__arrow svg { position: absolute; left: 0; top: 0; width: 40px; height: 40px; }
+	.pm-ic-'. $styled_name .' .splide__arrow.splide__arrow--prev svg { transform: rotate(180deg); }
+	.pm-ic-'. $styled_name .' img.pm-ic-img { width:100%; height:auto; display:block; }
+	.pm-ic-'. $styled_name .' .svg-hold-pmcarousel svg { width:100%; height:auto; display:block; }
+	.pm-ic-'. $styled_name .' .svg-hold-pmcarousel svg * { width: 100%; height: 100%; }
+	.pm-ic-'. $styled_name .' .pm-image { position:relative; }
+	
+	/* Content positioning */
+	.pm-ic-'. $styled_name .' .pm-alignment-override .caro-container { text-align:center; padding: 20px !important; position: absolute; display:flex; flex-direction: column; box-sizing:border-box; }
+	.pm-ic-'. $styled_name .' .pm-alignment-override.center .caro-container { top: 50%; left: 50%; transform:translate(-50%, -50%); text-align:center;  }
+	.pm-ic-'. $styled_name .' .pm-alignment-override.topleft .caro-container { top: 0; left: 0; text-align:left; }
+	.pm-ic-'. $styled_name .' .pm-alignment-override.topcenter .caro-container { top: 0; left: 50%; text-align:center; transform:translate(-50%, 0);}
+	.pm-ic-'. $styled_name .' .pm-alignment-override.topright .caro-container { top: 0; right: 0; text-align:right; }
+	
+	.pm-ic-'. $styled_name .' .pm-alignment-override.centerleft .caro-container { top: 50%; left: 0; text-align:left; transform:translate(0, -50%); }
+	.pm-ic-'. $styled_name .' .pm-alignment-override.centerright .caro-container { top: 0; right: 0; text-align:right; transform:translate(0, -50%); }
+	
+	.pm-ic-'. $styled_name .' .pm-alignment-override.bottomleft .caro-container { bottom: 0; left: 0; text-align:left;  }
+	.pm-ic-'. $styled_name .' .pm-alignment-override.bottomcenter .caro-container { bottom: 0; left: 50%; text-align:center; transform:translate(-50%,0); }
+	.pm-ic-'. $styled_name .' .pm-alignment-override.bottomright .caro-container { bottom: 0; right: 0; text-align:right; }
+	
+'; ?>
+<style><?= $helper->minify_css($css) ?></style>
+		
+    <?php } else { ?>
+    <p>No carousel images found for group id <?php echo $groupid; ?></p>
+    <?php } ?>
+
+<?php } else { ?>
+<p>No carousel group id assigned</p>
+<?php } ?>

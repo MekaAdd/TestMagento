@@ -1,0 +1,187 @@
+<?php
+/**
+ * Template for displaying Pixie Media Image Carousel
+ *
+ */
+?>
+<?php 
+$groupid = $block->getData('groupid');
+$group   = $block->getGroup($groupid);
+
+if($groupid) { 
+	$images = $block->carouselimages($groupid); 
+	$helper = $this->helper('PixieMedia\ImageCarousel\Helper\Cms');
+	$random = $helper->randomNumber();
+	$arrow  = '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" class="pm-ic-arrow" viewBox="0 0 20 20"><path  d="M10,20A10,10,0,1,0,0,10,10,10,0,0,0,10,20ZM8.711,4.3l5.7,5.766L8.7,15.711,7.3,14.289l4.289-4.242L7.289,5.7Z"/></svg>'; 
+	if($images) {
+	?>
+		
+			
+			<?php 
+			$title = $group->getLabel();
+			if(!$title) { $title = 'Image Carousel'; } 
+			?>
+			<?php $styled_name = $helper->cleanString($title.$random); ?>
+
+			<div class="block widget pm-widget-wrap block-products-list pm-ic-<?= $styled_name ?>">
+			<div class="feat-line">
+			<div class="feat-white">
+				<span class="pm-prev cat-prev cat-prev-<?= $styled_name; ?>"><?= $arrow ?></span>
+				<span class="title"><?= $title; ?></span>
+				<span class="pm-next cat-next cat-next-<?= $styled_name; ?>"><?= $arrow ?></span>
+			</div>
+			</div>
+	  
+			<div class="block-content pm-brands pm-ident-<?= $styled_name; ?>">
+			
+			<?php foreach($images as $image) {
+				
+				$photo     = ($image->getImage())?'<img src="'.$block->resize($image->getImage(),$group->getImagewidth(),$group->getImageheight()).'" class="pm-ic-img" alt="'.$image->getName().'" loading="lazy" />':false;
+				$svgBg     = (!$photo && $image->getBlockColour())?$block->getSvg($group->getImagewidth(), $group->getImageheight(),"w-full relative pm-carou-imagewrap", $image->getBlockColour()):false;
+				$link      = ($image->getLink() && $image->getLink() !== '#')?$image->getLink():false;
+			    $txtCol    = ($image->getTextColour())?'style="color:'.$image->getTextColour().' !important;"':'';
+			    $overlay   = ($image->getOverlayColour())?'<div class="pm-carou-overlay" style="background:'.$image->getOverlayColour().'"></div>':'';
+				$content   = ($image->getContent())?$image->getContent():false;
+			    $contAlign = ($image->getContentAlign())?'pm-alignment-override '.$image->getContentAlign():'';
+				
+				if(!$photo && !$svgBg) {
+					continue;
+				}
+				
+				echo '<div class="pm-brand-block">';
+				
+				if($link) {
+					echo '<a href="'.$image->getLink().'" title="'.$image->getName().'">';
+				}
+				
+				echo $photo.$svgBg.$overlay;
+				
+				if($link) {
+					echo '</a>';
+				}
+				
+				if($content) { 
+					echo '<div class="caro-content '. $contAlign .'" '. $txtCol .'><div class="caro-container">'.$helper->filterData($content) .'</div></div>';
+				}
+				
+				echo '</div>';
+				
+				
+			} ?>
+			</div>
+		</div>
+	
+	<script type="text/javascript">
+		require(['jquery','pixieslick'],function($){
+			$(".pm-ident-<?php echo $styled_name; ?>").slick({
+			  infinite: <?php if($group->getInfinite()) { echo 'true'; } else { echo 'false'; } ?>,
+			  speed: 300,
+			  slidesToShow: <?php echo $group->getSlidestoshow(); ?>,
+			  slidesToScroll: <?php echo $group->getSlidestoscroll(); ?>,
+			  nextArrow: '.cat-next-<?php echo $styled_name; ?>',
+			  prevArrow: '.cat-prev-<?php echo $styled_name; ?>',
+			  responsive: [
+				{
+				  breakpoint: <?php echo $group->getBreakpointone(); ?>,
+				  settings: {
+					slidesToShow: <?php echo $group->getResoneslidestoshow(); ?>,
+					slidesToScroll: <?php echo $group->getResoneslidestoscroll(); ?>,
+					
+				  }
+				},
+				{
+				  breakpoint: <?php echo $group->getBreakpointtwo(); ?>,
+				  settings: {
+					slidesToShow: <?php echo $group->getRestwoslidestoshow(); ?>,
+					slidesToScroll: <?php echo $group->getRestwoslidestoscroll(); ?>,
+					
+				  }
+				},
+				{
+				  breakpoint: <?php echo $group->getBreakpointthree(); ?>,
+				  settings: {
+					slidesToShow: <?php echo $group->getResthreeslidestoshow(); ?>,
+					slidesToScroll: <?php echo $group->getResthreeslidestoscroll(); ?>,
+					
+				  }
+				}
+			   
+			  ]
+			  
+			});
+		 });
+	</script>
+
+	<?php 
+	// CSS ADDED AND MINIFIED TO TEMPLATE TO PREVENT THE NEED FOR A STYLESHEET ON EVERY PAGE LOAD	
+	$css = '
+	
+	.columns .column.main { max-width:100% !important; }
+	.pm-ic-'. $styled_name .' { width:100%; max-width:100%; margin:25px auto; }
+	.pm-ic-'. $styled_name .' .feat-white { margin-bottom: 40px; }
+	.pm-ic-'. $styled_name .' { width:100%;  }
+	.pm-ident-'. $styled_name .' .pm-brand-block { width:100%; margin:0 10px !important; text-align:center; display:none; position:relative; }
+	.pm-ident-'. $styled_name .' .slick-initialized .pm-brand-block { display:block; }
+	.pm-ident-'. $styled_name .' .pm-brand-block .pm-carou-overlay { position:absolute; width: 100%; height: 100%; left: 50%; top: 50%; transform:translate(-50%,-50%); z-index: 2; }
+	.pm-ident-'. $styled_name .' .pm-brand-block .caro-content { position: absolute; z-index: 5; top:0; left: 0; padding: 10px; box-sizing:border-box; color:#000; width: 100%; height: 100%; left: 50%; top: 50%; transform:translate(-50%,-50%); }
+	.pm-ic-'. $styled_name .' .feat-line { width:100%; margin-bottom:25px; }
+	.pm-ic-'. $styled_name .' .feat-white { width:100%; position:relative; border-bottom:1px solid #dadada;font-size:24px; padding-bottom:1px; text-align:center; }
+	.pm-ic-'. $styled_name .' .pm-ic-arrow { width: 40px; height: 40px; }
+	.pm-ic-'. $styled_name .' .pm-prev { width:40px; height:40px; padding-right:20px; position:absolute; left:0; bottom:-20px; cursor:pointer; }
+	.pm-ic-'. $styled_name .' .pm-prev svg { transform: rotate(180deg); }
+	.pm-ic-'. $styled_name .' .pm-next { width:40px; height:40px; padding-left:20px; position:absolute; right:0; bottom:-20px; cursor:pointer; }
+	.pm-ic-'. $styled_name .' img.pm-ic-img { width:100%; height:auto; display:block; }
+	.pm-ic-'. $styled_name .' .svg-hold-pmcarousel svg { width:100%; height:auto; display:block; }
+	.pm-ic-'. $styled_name .' .svg-hold-pmcarousel svg * { width: 100%; height: 100%; }
+	.pm-ic-'. $styled_name .' .pm-image { position:relative; }
+	
+	/* Content positioning */
+	.pm-ic-'. $styled_name .' .pm-alignment-override .caro-container { text-align:center; padding: 20px !important; position: absolute; display:flex; flex-direction: column; box-sizing:border-box; }
+	.pm-ic-'. $styled_name .' .pm-alignment-override.center .caro-container { top: 50%; left: 50%; transform:translate(-50%, -50%); text-align:center;  }
+	.pm-ic-'. $styled_name .' .pm-alignment-override.topleft .caro-container { top: 0; left: 0; text-align:left; }
+	.pm-ic-'. $styled_name .' .pm-alignment-override.topcenter .caro-container { top: 0; left: 50%; text-align:center; transform:translate(-50%, 0);}
+	.pm-ic-'. $styled_name .' .pm-alignment-override.topright .caro-container { top: 0; right: 0; text-align:right; }
+	
+	.pm-ic-'. $styled_name .' .pm-alignment-override.centerleft .caro-container { top: 50%; left: 0; text-align:left; transform:translate(0, -50%); }
+	.pm-ic-'. $styled_name .' .pm-alignment-override.centerright .caro-container { top: 0; right: 0; text-align:right; transform:translate(0, -50%); }
+	
+	.pm-ic-'. $styled_name .' .pm-alignment-override.bottomleft .caro-container { bottom: 0; left: 0; text-align:left;  }
+	.pm-ic-'. $styled_name .' .pm-alignment-override.bottomcenter .caro-container { bottom: 0; left: 50%; text-align:center; transform:translate(-50%,0); }
+	.pm-ic-'. $styled_name .' .pm-alignment-override.bottomright .caro-container { bottom: 0; right: 0; text-align:right; }
+	
+	
+
+	/* Slick */
+	.pm-ic-'. $styled_name .' .slick-slider {  position: relative; display: block;  -moz-box-sizing: border-box; box-sizing: border-box;  -webkit-user-select: none;  -moz-user-select: none;  -ms-user-select: none;  -webkit-touch-callout: none;  -khtml-user-select: none;  -ms-touch-action: pan-y;  -webkit-tap-highlight-color: transparent; }
+
+	.pm-ic-'. $styled_name .' .slick-list { position: relative; display: block; overflow: hidden; margin: 0; padding: 0; }
+	.pm-ic-'. $styled_name .' .slick-list:focus { outline: none; }
+	.pm-ic-'. $styled_name .' .slick-list.dragging { cursor: pointer; }
+
+	.pm-ic-'. $styled_name .' .slick-slider .slick-track, .pm-ic-'. $styled_name .' .slick-slider .slick-list {  -webkit-transform: translate3d(0, 0, 0);  -moz-transform: translate3d(0, 0, 0);  -ms-transform: translate3d(0, 0, 0);       -o-transform: translate3d(0, 0, 0);  transform: translate3d(0, 0, 0); }
+
+	.pm-ic-'. $styled_name .' .slick-track { position: relative;  top: 0;  left: 0;  display: block; }
+	.pm-ic-'. $styled_name .' .slick-track:before, .pm-ic-'. $styled_name .' .slick-track:after { display: table; content: \'\'; }
+	.pm-ic-'. $styled_name .' .slick-track:after { clear: both; }
+	.pm-ic-'. $styled_name .' .pm-ic-'. $styled_name .' .slick-loading .slick-track { visibility: hidden; }
+
+	.pm-ic-'. $styled_name .' .slick-slide { display: none; float: left; height: 100%; min-height: 1px; }
+	.pm-ic-'. $styled_name .' [dir=\'rtl\'] .slick-slide { float: right; }
+	.pm-ic-'. $styled_name .' .slick-slide .brand-block { text-align:center; }
+	.pm-ic-'. $styled_name .' .slick-slide img { display: inline-block; }
+	.pm-ic-'. $styled_name .' .slick-slide.slick-loading img { display: none; }
+
+	.pm-ic-'. $styled_name .' .slick-initialized .slick-slide { display: block; }
+	.pm-ic-'. $styled_name .' .slick-loading .slick-slide { visibility: hidden; }
+	.pm-ic-'. $styled_name .' .slick-vertical .slick-slide { display: block; height: auto; border: 1px solid transparent; }
+	.pm-ic-'. $styled_name .' .slick-arrow.slick-hidden { display: none; }
+'; ?>
+<style><?= $helper->minify_css($css) ?></style>
+		
+    <?php } else { ?>
+    <p>No carousel images found for group id <?php echo $groupid; ?></p>
+    <?php } ?>
+
+<?php } else { ?>
+<p>No carousel group id assigned</p>
+<?php } ?>

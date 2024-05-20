@@ -1,0 +1,65 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * PixieMedia_ImageCarousel extension
+ *                     NOTICE OF LICENSE
+ * 
+ *                     This source file is subject to the MIT License
+ *                     that is bundled with this package in the file LICENSE.txt.
+ *                     It is also available through the world-wide-web at this URL:
+ *                     http://opensource.org/licenses/mit-license.php
+ * 
+ *                     @category  PixieMedia
+ *                     @package   PixieMedia_ImageCarousel
+ *                     @copyright Copyright (c) 2022
+ *                     @license   http://opensource.org/licenses/mit-license.php MIT License
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+
+	<table comment="Pixie ImageCarousel Images" engine="innodb" name="pixiemedia_imagecarousel_cimage" resource="default">
+		<column comment="Entity Id" identity="true" name="cimage_id" nullable="false" padding="12" unsigned="false" xsi:type="int"/>
+		<constraint referenceId="PRIMARY" xsi:type="primary">
+			<column name="cimage_id"/>
+		</constraint>
+		<column comment="Group Id" name="cgroup_id" nullable="true" padding="12" unsigned="false" xsi:type="int"/>
+		<column name="name" length="255" nullable="true" xsi:type="varchar"/>
+        <column name="image" length="255" nullable="true" xsi:type="varchar"/>
+		<column name="link" length="255" nullable="true" xsi:type="varchar"/>
+		<column name="sort" length="255" nullable="true" xsi:type="varchar"/>
+		<column name="status" xsi:type="smallint" unsigned="true" nullable="false" identity="false" comment="Status"/>
+		<column name="updated_at" xsi:type="timestamp" on_update="true" nullable="true" default="CURRENT_TIMESTAMP" comment="Last Updated"/>
+        <column name="created_at" xsi:type="timestamp" on_update="false" nullable="true" default="CURRENT_TIMESTAMP"  comment="Last Updated"/>
+		<column name="content" xsi:type="text" nullable="false" comment="Content"/>
+		<column name="text_colour" xsi:type="text" nullable="false" comment="Content"/>
+		<column name="block_colour" length="255" nullable="true" xsi:type="varchar"/>
+		<column name="overlay_colour" length="255" nullable="true" xsi:type="varchar"/>
+		<column name="content_align" length="255" nullable="true" xsi:type="varchar"/>
+    </table>
+	
+	<table comment="Pixie ImageCarousel Groups" engine="innodb" name="pixiemedia_imagecarousel_cgroup" resource="default">
+		<column comment="Entity Id" identity="true" name="cgroup_id" nullable="false" padding="12" unsigned="false" xsi:type="int"/>
+		<constraint referenceId="PRIMARY" xsi:type="primary">
+			<column name="cgroup_id"/>
+		</constraint>
+		<column name="label" length="255" nullable="true" xsi:type="varchar"/>
+		<column name="imagewidth" nullable="true" padding="12" unsigned="false" xsi:type="int"/>
+		<column name="imageheight" nullable="true" padding="12" unsigned="false" xsi:type="int"/>
+		<column name="infinite" nullable="true" padding="12" unsigned="false" xsi:type="int"/>
+		<column name="slidestoshow" nullable="false" xsi:type="text" />
+		<column name="slidestoscroll" nullable="true" padding="12" unsigned="false" xsi:type="int"/>
+		<column name="breakpointone" nullable="true" padding="12" unsigned="false" xsi:type="int"/>
+		<column name="resoneslidestoshow" nullable="true" padding="12" unsigned="false" xsi:type="int"/>
+		<column name="resoneslidestoscroll" nullable="true" padding="12" unsigned="false" xsi:type="int"/>
+		<column name="breakpointtwo" nullable="true" padding="12" unsigned="false" xsi:type="int"/>
+		<column name="restwoslidestoshow" nullable="true" padding="12" unsigned="false" xsi:type="int"/>
+		<column name="restwoslidestoscroll" nullable="true" padding="12" unsigned="false" xsi:type="int"/>
+		<column name="breakpointthree" nullable="true" padding="12" unsigned="false" xsi:type="int"/>
+		<column name="resthreeslidestoshow" nullable="true" padding="12" unsigned="false" xsi:type="int"/>
+		<column name="resthreeslidestoscroll" nullable="true" padding="12" unsigned="false" xsi:type="int"/>
+		<column xsi:type="timestamp" name="updated_at" on_update="true" nullable="true" default="CURRENT_TIMESTAMP" comment="Last Updated"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="true" default="CURRENT_TIMESTAMP"  comment="Last Updated"/>
+		
+	</table>	
+</schema>

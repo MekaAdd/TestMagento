@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Widget:etc/widget.xsd">
+    <widget id="pm_carousel" class="PixieMedia\ImageCarousel\Block\Carousel">
+        <label translate="true">Pixie Image Carousel</label>
+        <description>Select your Pixie Image Carouselfrom the list</description>
+        <parameters>
+            <parameter name="groupid" xsi:type="select" visible="true" source_model="PixieMedia\ImageCarousel\Model\ResourceModel\Cgroup\Collection">
+                <label translate="true">Choose Pixie Carousel</label>
+            </parameter>
+            <parameter name="template" xsi:type="select" required="true" visible="true">
+                <label translate="true">Template</label>
+                <options>
+                    <option name="block_template" value="PixieMedia_ImageCarousel::carousel.phtml">
+                        <label translate="true">Regular template</label>
+                    </option>
+					<option name="hyva_template" value="PixieMedia_ImageCarousel::carousel-hyva.phtml">
+                        <label translate="true">Hyva template</label>
+                    </option>
+                </options>
+            </parameter>
+        </parameters>
+    </widget>
+</widgets>
